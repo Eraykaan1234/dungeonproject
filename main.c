@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include "dungeon.h"
 #include "player.h"
 #include "combat.h"
@@ -33,6 +32,9 @@ int main(int argc, char* argv[]) {
 
     printf("Dungeon met %d kamers gegenereerd.\n", numberOfRooms);
 
+    // Voorbeeld: plaats 1 monster in kamer 1
+    if (numberOfRooms > 1) dungeon[1]->monster = 1;
+
     while (1) {
         Room* currentRoom = dungeon[player.currentRoom];
         if (!currentRoom->visited) {
@@ -56,9 +58,11 @@ int main(int argc, char* argv[]) {
         printRoom(currentRoom);
         printf("Kies een deur om door te gaan (id): ");
         int choice;
-        scanf("%d", &choice);
+        if (scanf("%d", &choice) != 1) {
+            printf("Ongeldige invoer. Exit.\n");
+            break;
+        }
 
-        // Check of keuze geldig is
         int valid = 0;
         for (int i = 0; i < currentRoom->neighbor_count; i++) {
             if (currentRoom->neighbors[i]->id == choice) {
