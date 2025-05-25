@@ -1,81 +1,56 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "dungeon.h"
 #include "player.h"
 #include "combat.h"
+#include "save.h"
+#include "utils.h"
 
-void printRoom(Room* room) {
-    printf("Kamer %d\n", room->id);
-    printf("Deuren naar kamers:");
-    for (int i = 0; i < room->neighbor_count; i++) {
-        printf(" %d", room->neighbors[i]->id);
-    }
-    printf("\n");
-}
-
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     if (argc < 2) {
-        printf("Gebruik: %s <aantal kamers>\n", argv[0]);
+        printf("Gebruik: %s <aantal_kamers> of %s load\n", argv[0], argv[0]);
         return 1;
     }
 
-    int numberOfRooms = atoi(argv[1]);
-    if (numberOfRooms < 2) {
-        printf("Aantal kamers moet minstens 2 zijn.\n");
-        return 1;
+    Player *player = malloc(sizeof(Player));
+    Room **rooms = NULL;
+    int room_count = 0;
+
+    if (strcmp(argv[1], "load") == 0) {
+        load_game(&rooms, &room_count, player);
+        printf("Spel geladen.\n");
+    } else {
+        room_count = atoi(argv[1]);
+        generate_dungeon(&rooms, room_count);
+        init_player(player);
+        printf("Nieuw spel gestart met %d kamers.\n", room_count);
     }
 
-    generateDungeon(numberOfRooms);
-
-    Player player;
-    initPlayer(&player);
-
-    printf("Dungeon met %d kamers gegenereerd.\n", numberOfRooms);
-
-    // Voorbeeld: plaats 1 monster in kamer 1
-    if (numberOfRooms > 1) dungeon[1]->monster = 1;
-
-    while (1) {
-        Room* currentRoom = dungeon[player.currentRoom];
-        if (!currentRoom->visited) {
-            printf("Je betreedt kamer %d.\n", currentRoom->id);
-            currentRoom->visited = 1;
-            if (currentRoom->monster) {
-                fight(&player, currentRoom);
-                if (player.hp <= 0) {
-                    printf("Game over!\n");
-                    break;
-                }
-            }
-            if (currentRoom->treasure) {
-                printf("Je hebt de schat gevonden! Gefeliciteerd!\n");
-                break;
-            }
+    int playing = 1;
+    while (playing) {
+        Room *current = rooms[player->location];
+        if (!current->visited) {
+            enter_room(current, player);
+            current->visited = 1;
         } else {
-            printf("Je bent terug in kamer %d.\n", currentRoom->id);
+            printf("Je bent terug in kamer %d.\n", current->id);
         }
 
-        printRoom(currentRoom);
-        printf("Kies een deur om door te gaan (id): ");
-        int choice;
-        if (scanf("%d", &choice) != 1) {
-            printf("Ongeldige invoer. Exit.\n");
+        if (current->has_treasure) {
+            printf("Je hebt de schat gevonden! Gefeliciteerd!\n");
             break;
         }
 
-        int valid = 0;
-        for (int i = 0; i < currentRoom->neighbor_count; i++) {
-            if (currentRoom->neighbors[i]->id == choice) {
-                player.currentRoom = choice;
-                valid = 1;
-                break;
-            }
-        }
-        if (!valid) {
-            printf("Ongeldige keuze, probeer opnieuw.\n");
-        }
+        print_doors(current);
+        printf("Kies een deur: ");
+        int choice;
+        scanf("%d", &choice);
+        player->location = choice;
     }
 
-    freeDungeon();
+    save_game(rooms, room_count, player);
+    free_dungeon(rooms, room_count);
+    free(player);
     return 0;
 }

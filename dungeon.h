@@ -7,13 +7,13 @@ typedef struct Room {
     int monster;  // 0 = geen, 1 = goblin, 2 = orc
     int item;     // 0 = geen, 1 = healing, 2 = damage boost
     int treasure; // 0 = nee, 1 = ja
-    struct Room** neighbors;
+    struct Room **neighbors;
     int neighbor_count;
 } Room;
 
 void generateDungeon(int numberOfRooms);
 void freeDungeon();
-
+    
 extern Room** dungeon;
 extern int dungeonSize;
 
