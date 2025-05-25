@@ -17,14 +17,13 @@ void generateDungeon(int numberOfRooms) {
         dungeon[i]->neighbor_count = 0;
         dungeon[i]->neighbors = NULL;
     }
-    // Simpel voorbeeld connecties
-    if (dungeonSize > 1) {
-        dungeon[0]->neighbor_count = 1;
-        dungeon[0]->neighbors = malloc(sizeof(Room*));
-        dungeon[0]->neighbors[0] = dungeon[1];
+    // Eenvoudige connecties: lineair
+    for (int i = 0; i < dungeonSize - 1; i++) {
+        dungeon[i]->neighbor_count = 1;
+        dungeon[i]->neighbors = malloc(sizeof(Room*));
+        dungeon[i]->neighbors[0] = dungeon[i+1];
     }
 }
-
 void freeDungeon() {
     for (int i = 0; i < dungeonSize; i++) {
         free(dungeon[i]->neighbors);
