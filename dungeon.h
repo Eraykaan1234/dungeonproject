@@ -1,20 +1,24 @@
 #ifndef DUNGEON_H
 #define DUNGEON_H
 
+#include "player.h"
+
+typedef enum { EMPTY, MONSTER, ITEM, TREASURE } RoomType;
+
 typedef struct Room {
     int id;
+    RoomType type;
     int visited;
-    int monster;  // 0 = geen, 1 = goblin, 2 = orc
-    int item;     // 0 = geen, 1 = healing, 2 = damage boost
-    int treasure; // 0 = nee, 1 = ja
-    struct Room **neighbors;
-    int neighbor_count;
+    int has_treasure;
+    int num_doors;
+    int *connections;
+    struct Monster *monster;
+    struct Item *item;
 } Room;
 
-void generateDungeon(int numberOfRooms);
-void freeDungeon();
-    
-extern Room** dungeon;
-extern int dungeonSize;
+void generate_dungeon(Room ***rooms, int count);
+void enter_room(Room *room, Player *player);
+void print_doors(Room *room);
+void free_dungeon(Room **rooms, int count);
 
 #endif
