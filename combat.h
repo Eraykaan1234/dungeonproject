@@ -4,6 +4,12 @@
 #include "player.h"
 #include "dungeon.h"
 
-void fight(Player* player, Room* room);
+typedef struct Monster {
+    char name[20];
+    int hp;
+    int damage;
+} Monster;
+
+void combat(Player *player, Monster *monster);
 
 #endif

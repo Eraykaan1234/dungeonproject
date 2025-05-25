@@ -1,10 +1,10 @@
 #ifndef SAVE_H
 #define SAVE_H
 
-#include "player.h"
 #include "dungeon.h"
+#include "player.h"
 
-int save_game(const char *filename, Player *player, Room *rooms[], int room_count);
-int load_game(const char *filename, Player *player, Room *rooms[], int room_count);
+void save_game(Room **rooms, int count, Player *player);
+void load_game(Room ***rooms, int *count, Player *player);
 
 #endif

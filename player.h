@@ -1,12 +1,12 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-typedef struct Player {
-    int currentRoom;
+typedef struct {
+    int location;
     int hp;
     int damage;
 } Player;
 
-void initPlayer(Player* player);
+void init_player(Player *player);
 
 #endif

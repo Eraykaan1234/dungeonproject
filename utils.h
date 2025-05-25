@@ -1,6 +1,13 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-int random_getal_tussen(int min, int max);
+typedef struct Item {
+    char name[20];
+    int hp_boost;
+    int dmg_boost;
+} Item;
+
+int randint(int min, int max);
+char *read_line();
 
 #endif
