@@ -8,7 +8,7 @@ void fight(Player* player, Room* room) {
     Monster* monster = room->monster;
     if (!monster) return;
 
-    printf("⚔️ Gevecht begint tegen: 💀 %s\033[0m\n", monster->name);
+    printf("\n\033[1mGEVECHT BEGINT TEGEN: %s\033[0m\n", monster->name);
     srand(time(NULL));
 
     while (player->hp > 0 && monster->hp > 0) {
@@ -24,13 +24,13 @@ void fight(Player* player, Room* room) {
             if (bit == 0) {
                 player->hp -= monster->damage;
                 if (player->hp < 0) player->hp = 0;
-                printf("\033[31m💀 %s valt aan! 🧝 Speler verliest %d hp (\033[1m%d\033[0m)\n",
+                printf("\033[31m%s valt aan! Speler verliest %d hp (\033[1m%d\033[0m)\n",
                        monster->name, monster->damage, player->hp);
                 if (player->hp == 0) break;
             } else {
                 monster->hp -= player->damage;
                 if (monster->hp < 0) monster->hp = 0;
-                printf("\033[32m🔪 Speler valt aan! %s verliest %d hp (\033[1m%d\033[0m)\n",
+                printf("\033[32mSpeler valt aan! %s verliest %d hp (\033[1m%d\033[0m)\n",
                        monster->name, player->damage, monster->hp);
                 if (monster->hp == 0) break;
             }
@@ -38,9 +38,9 @@ void fight(Player* player, Room* room) {
     }
 
     if (player->hp == 0) {
-        printf("\033[31m☠️  De speler is verslagen!\033[0m\n");
+        printf("\033[31mDe speler is verslagen!\033[0m\n");
     } else {
-        printf("\033[32m☠️ %s is verslagen!\033[0m\n", monster->name);
+        printf("\033[32m%s is verslagen!\033[0m\n", monster->name);
         free(room->monster);
         room->monster = NULL;
     }
