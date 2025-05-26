@@ -127,13 +127,16 @@ void enter_room(Room *room, Player *player) {
 
 
 void print_doors(Room *room) {
-    printf("De kamer heeft deuren naar kamers: ");
+    printf("\033[36m---------------------------\n");
+    printf("De kamer heeft deuren naar kamers:\n");
+
     for (int i = 0; i < 4; i++) {
         if (room->connections[i] != -1) {
-            printf("%d ", room->connections[i]);
+            printf("  - Kamer %d\n", room->connections[i]);
         }
     }
-    printf("\n");
+
+    printf("---------------------------\033[0m\n");
 }
 
 void free_dungeon(Room **rooms, int count) {
