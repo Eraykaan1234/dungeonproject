@@ -32,34 +32,35 @@ int main(int argc, char *argv[]) {
     }
 
     while (1) {
-        if (player->hp <= 0) {
-            printf("Game over.\n");
-            break;
-        }
-
         Room *current = rooms[player->location];
 
-        if (!current->visited) {
-            enter_room(current, player);
-            current->visited = 1;
+if (!current->visited) {
+    enter_room(current, player);
+    current->visited = 1;
+} else {
+    printf("Je bent terug in kamer %d.\n", current->id);
+}
 
-            if (player->hp <= 0) {
-                printf("Game over.\n");
-                break;
-            }
-        } else {
-            printf("Je bent terug in kamer %d.\n", current->id);
-        }
+// ✅ Dood check direct na kamer binnenkomst
+if (player->hp <= 0) {
+    printf("Game over.\n");
+    break;
+}
 
         if (current->has_treasure) {
             printf("Je hebt de schat gevonden! Gefeliciteerd!\n");
             break;
         }
 
-        print_doors(current);
-        printf("Kies een deur: ");
-        int choice;
-        scanf("%d", &choice);
+printf("Kies een deur: ");
+char input[10];
+fgets(input, sizeof(input), stdin);
+int choice;
+if (sscanf(input, "%d", &choice) != 1) {
+    printf("Ongeldige invoer. Typ een kamernummer.\n");
+    continue;
+}
+
 
         int valid = 0;
         for (int i = 0; i < 4; i++) {
