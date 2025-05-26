@@ -43,22 +43,25 @@ void generate_dungeon(Room ***rooms_ptr, int count) {
         rooms[i] = create_room(i);
     }
 
+    // Maak verbindingen
     for (int i = 1; i < count; i++) {
         int connect_to = rand() % i;
         connect_rooms(rooms, i, connect_to);
     }
 
-    // Plaats de schat
-    int treasure_idx = rand() % count;
+    // Plaats de schat in een latere kamer
+    int treasure_idx = count - 1 - rand() % (count / 4);
     rooms[treasure_idx]->has_treasure = 1;
 
-    // Voeg monsters toe
-    int monster_count = count / 4;
-    for (int i = 0; i < monster_count; i++) {
+    // Voeg monsters toe (1/3 van kamers)
+    int monster_count = count / 3;
+    int monsters_placed = 0;
+    while (monsters_placed < monster_count) {
         int idx = rand() % count;
-        if (!rooms[idx]->monster) {
+        if (!rooms[idx]->monster && !rooms[idx]->has_treasure) {
             Monster *m = malloc(sizeof(Monster));
-            if (rand() % 2) {
+            int type = rand() % 2;
+            if (type == 0) {
                 strcpy(m->name, "Goblin");
                 m->hp = 8;
                 m->damage = 3;
@@ -68,16 +71,19 @@ void generate_dungeon(Room ***rooms_ptr, int count) {
                 m->damage = 5;
             }
             rooms[idx]->monster = m;
+            monsters_placed++;
         }
     }
 
-    // Voeg items toe
-    int item_count = count / 4;
-    for (int i = 0; i < item_count; i++) {
+    // Voeg items toe (1/3 van kamers)
+    int item_count = count / 3;
+    int items_placed = 0;
+    while (items_placed < item_count) {
         int idx = rand() % count;
-        if (!rooms[idx]->item) {
+        if (!rooms[idx]->item && !rooms[idx]->has_treasure && !rooms[idx]->monster) {
             Item *it = malloc(sizeof(Item));
-            if (rand() % 2) {
+            int type = rand() % 2;
+            if (type == 0) {
                 it->type = HEAL;
                 it->value = 5 + rand() % 6; // 5–10
             } else {
@@ -85,6 +91,7 @@ void generate_dungeon(Room ***rooms_ptr, int count) {
                 it->value = 1 + rand() % 3; // 1–3
             }
             rooms[idx]->item = it;
+            items_placed++;
         }
     }
 
@@ -92,26 +99,31 @@ void generate_dungeon(Room ***rooms_ptr, int count) {
 }
 
 void enter_room(Room *room, Player *player) {
-    printf("Je betreedt kamer %d.\n", room->id);
+    printf("\033[33m===========================\n");
+    printf("\033[1m🧝 Je betreedt kamer %d\033[0m\n", room->id);
+    printf("\033[33m---------------------------\033[0m\n");
 
-    // Items verwerken
+    // Items
     if (room->item) {
         if (room->item->type == HEAL) {
             player->hp += room->item->value;
-            printf("Je vindt een healing item! HP +%d (%d)\n", room->item->value, player->hp);
+            printf("🎁 Je vindt een healing item! 💊 HP +%d (\033[1m%d\033[0m)\n", room->item->value, player->hp);
         } else if (room->item->type == DAMAGE) {
             player->damage += room->item->value;
-            printf("Je vindt een kracht-item! Damage +%d (%d)\n", room->item->value, player->damage);
+            printf("🎁 Je vindt een kracht-item! 📈 Damage +%d (\033[1m%d\033[0m)\n", room->item->value, player->damage);
         }
         free(room->item);
         room->item = NULL;
     }
 
-    // Monster gevecht
+    // Monster
     if (room->monster) {
         fight(player, room);
     }
+
+    printf("\033[33m===========================\n\033[0m");
 }
+
 
 void print_doors(Room *room) {
     printf("De kamer heeft deuren naar kamers: ");
