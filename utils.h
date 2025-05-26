@@ -1,13 +1,13 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+typedef enum { HEAL, DAMAGE } ItemType;
+
 typedef struct Item {
-    char name[20];
-    int hp_boost;
-    int dmg_boost;
+    ItemType type;
+    int value;
 } Item;
 
-int randint(int min, int max);
-char *read_line();
+int random_getal_tussen(int min, int max);
 
 #endif

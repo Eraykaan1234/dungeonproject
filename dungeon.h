@@ -2,7 +2,8 @@
 #define DUNGEON_H
 
 #include "player.h"
-#include "item.h" // <-- toegevoegd voor Item-type
+#include "utils.h"
+#include "combat.h"  // voor struct Monster
 
 typedef enum { EMPTY, MONSTER, ITEM, TREASURE } RoomType;
 
@@ -11,8 +12,7 @@ typedef struct Room {
     RoomType type;
     int visited;
     int has_treasure;
-    int num_doors;
-    int *connections;         // <-- correcte naam voor deurverbindingen
+    int connections[4];         // max 4 richtingen (N, O, Z, W)
     struct Monster *monster;
     struct Item *item;
 } Room;

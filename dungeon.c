@@ -6,6 +6,7 @@
 #include "combat.h"
 #include "player.h"
 #include <string.h>
+#include "utils.h"
 
 
 Room *create_room(int id) {
