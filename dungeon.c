@@ -5,6 +5,8 @@
 #include "dungeon.h"
 #include "combat.h"
 #include "player.h"
+#include <string.h>
+
 
 Room *create_room(int id) {
     Room *room = malloc(sizeof(Room));
@@ -14,21 +16,21 @@ Room *create_room(int id) {
     room->has_treasure = 0;
     room->visited = 0;
     for (int i = 0; i < 4; i++) {
-        room->doors[i] = -1;
+        room->connections[i] = -1;
     }
     return room;
 }
 
 void connect_rooms(Room **rooms, int from, int to) {
     for (int i = 0; i < 4; i++) {
-        if (rooms[from]->doors[i] == -1) {
-            rooms[from]->doors[i] = to;
+        if (rooms[from]->connections[i] == -1) {
+            rooms[from]->connections[i] = to;
             break;
         }
     }
     for (int i = 0; i < 4; i++) {
-        if (rooms[to]->doors[i] == -1) {
-            rooms[to]->doors[i] = from;
+        if (rooms[to]->connections[i] == -1) {
+            rooms[to]->connections[i] = from;
             break;
         }
     }
@@ -50,15 +52,15 @@ void generate_dungeon(Room ***rooms_ptr, int count) {
         int idx = rand() % count;
         if (!rooms[idx]->monster) {
             Monster *m = malloc(sizeof(Monster));
-            if (rand() % 2) {
-                m->name = "Goblin";
-                m->hp = 8;
-                m->damage = 3;
-            } else {
-                m->name = "Orc";
-                m->hp = 12;
-                m->damage = 4;
-            }
+          if (rand() % 2) {
+    strcpy(m->name, "Goblin");
+    m->hp = 8;
+    m->damage = 3;
+} else {
+    strcpy(m->name, "Orc");
+    m->hp = 12;
+    m->damage = 4;
+}
             rooms[idx]->monster = m;
         }
     }
@@ -111,8 +113,8 @@ void enter_room(Room *room, Player *player) {
 void print_doors(Room *room) {
     printf("Deuren naar kamers: ");
     for (int i = 0; i < 4; i++) {
-        if (room->doors[i] != -1) {
-            printf("%d ", room->doors[i]);
+        if (room->connections[i] != -1) {
+            printf("%d ", room->connections[i]);
         }
     }
     printf("\n");
