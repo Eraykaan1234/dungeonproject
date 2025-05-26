@@ -7,6 +7,8 @@
 #include "player.h"
 #include <string.h>
 #include "utils.h"
+#include "item.h"
+
 
 
 Room *create_room(int id) {

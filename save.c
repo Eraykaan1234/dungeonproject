@@ -1,46 +1,95 @@
 #include <stdio.h>
-#include "save.h"
-#include "dungeon.h" 
-int save_game(const char *filename, Player *player, Room *rooms[], int room_count) {
-    FILE *file = fopen(filename, "w");
-    if (!file) return 0;
+#include <stdlib.h>
+#include "dungeon.h"
+#include "player.h"
+#include "item.h"
 
-    fprintf(file, "%d %d %d\n", player->current_room_id, player->hp, player->damage);
-    fprintf(file, "%d\n", room_count);
+void save_game(const char *filename, Player *player, Room **rooms, int room_count) {
+    FILE *file = fopen(filename, "w");
+    if (!file) {
+        perror("Kan bestand niet openen om op te slaan");
+        return;
+    }
+
+    fprintf(file, "%s %d %d %d\n", player->name, player->hp, player->damage, player->current_room);
 
     for (int i = 0; i < room_count; i++) {
         Room *r = rooms[i];
-        fprintf(file, "%d %d %d %d %d\n", r->id, r->visited, r->has_monster, r->has_item, r->has_treasure);
+        fprintf(file, "ROOM %d ", r->id);
+        for (int j = 0; j < 4; j++) {
+            fprintf(file, "%d ", r->connections[j]);
+        }
+        fprintf(file, "%d ", r->visited);
+        fprintf(file, "%d ", r->has_treasure);
+
+        if (r->item != NULL) {
+            fprintf(file, "ITEM %d %d ", r->item->type, r->item->value);
+        } else {
+            fprintf(file, "NOITEM ");
+        }
+
+        if (r->monster != NULL) {
+            fprintf(file, "MONSTER %s %d %d\n", r->monster->name, r->monster->hp, r->monster->damage);
+        } else {
+            fprintf(file, "NOMONSTER\n");
+        }
     }
 
     fclose(file);
-    return 1;
 }
 
-int load_game(const char *filename, Player *player, Room *rooms[], int room_count) {
+void load_game(const char *filename, Player *player, Room ***rooms_ptr, int *room_count_ptr) {
     FILE *file = fopen(filename, "r");
-    if (!file) return 0;
-
-    fscanf(file, "%d %d %d", &player->current_room_id, &player->hp, &player->damage);
-    int loaded_room_count;
-    fscanf(file, "%d", &loaded_room_count);
-
-    if (loaded_room_count != room_count) {
-        fclose(file);
-        return 0;
+    if (!file) {
+        perror("Kan bestand niet openen om te laden");
+        return;
     }
 
-    for (int i = 0; i < room_count; i++) {
-        int id, visited, has_monster, has_item, has_treasure;
-        fscanf(file, "%d %d %d %d %d", &id, &visited, &has_monster, &has_item, &has_treasure);
-        Room *r = rooms[i];
-        r->id = id;
-        r->visited = visited;
-        r->has_monster = has_monster;
-        r->has_item = has_item;
-        r->has_treasure = has_treasure;
+    fscanf(file, "%s %d %d %d", player->name, &player->hp, &player->damage, &player->current_room);
+
+    Room **rooms = malloc(sizeof(Room*) * 100);
+    int count = 0;
+
+    while (!feof(file)) {
+        char label[20];
+        fscanf(file, "%s", label);
+        if (strcmp(label, "ROOM") != 0) break;
+
+        Room *r = malloc(sizeof(Room));
+        fscanf(file, "%d", &r->id);
+        for (int i = 0; i < 4; i++) {
+            fscanf(file, "%d", &r->connections[i]);
+        }
+        fscanf(file, "%d", &r->visited);
+        fscanf(file, "%d", &r->has_treasure);
+
+        char item_label[20];
+        fscanf(file, "%s", item_label);
+        if (strcmp(item_label, "ITEM") == 0) {
+            r->item = malloc(sizeof(Item));
+            int type, value;
+            fscanf(file, "%d %d", &type, &value);
+            r->item->type = type;
+            r->item->value = value;
+        } else {
+            r->item = NULL;
+        }
+
+        char monster_label[20];
+        fscanf(file, "%s", monster_label);
+        if (strcmp(monster_label, "MONSTER") == 0) {
+            r->monster = malloc(sizeof(Monster));
+            r->monster->name = malloc(50);
+            fscanf(file, "%s %d %d", r->monster->name, &r->monster->hp, &r->monster->damage);
+        } else {
+            r->monster = NULL;
+        }
+
+        rooms[count++] = r;
     }
+
+    *rooms_ptr = rooms;
+    *room_count_ptr = count;
 
     fclose(file);
-    return 1;
 }
