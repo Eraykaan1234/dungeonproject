@@ -62,28 +62,31 @@ void load_game(const char *filename, Player *player, Room ***rooms_ptr, int *roo
         r->item = NULL;
 
         fscanf(file, "%d", &r->id);
-
         for (int j = 0; j < 4; j++) {
             fscanf(file, "%d", &r->connections[j]);
         }
-
         fscanf(file, "%d %d", &r->visited, &r->has_treasure);
 
+        // ITEM-token apart lezen
         char token[20];
         fscanf(file, "%s", token);
-
         if (strcmp(token, "ITEM") == 0) {
             r->item = malloc(sizeof(Item));
             int type, value;
             fscanf(file, "%d %d", &type, &value);
             r->item->type = type;
             r->item->value = value;
-            fscanf(file, "%s", token); // Lees volgende token: MONSTER of NOMONSTER
+        } else if (strcmp(token, "NOITEM") != 0) {
+            printf("Fout: Onbekend itemtoken: %s\n", token);
         }
 
+        // MONSTER-token apart lezen
+        fscanf(file, "%s", token);
         if (strcmp(token, "MONSTER") == 0) {
             r->monster = malloc(sizeof(Monster));
             fscanf(file, "%s %d %d", r->monster->name, &r->monster->hp, &r->monster->damage);
+        } else if (strcmp(token, "NOMONSTER") != 0) {
+            printf("Fout: Onbekend monstertoken: %s\n", token);
         }
 
         rooms[i] = r;
