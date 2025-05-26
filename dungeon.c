@@ -100,17 +100,17 @@ void generate_dungeon(Room ***rooms_ptr, int count) {
 
 void enter_room(Room *room, Player *player) {
     printf("\033[33m===========================\n");
-    printf("\033[1m🧝 Je betreedt kamer %d\033[0m\n", room->id);
-    printf("\033[33m---------------------------\033[0m\n");
+    printf("\033[1mJe betreedt kamer %d\033[0m\n", room->id);
+    printf("---------------------------\033[0m\n");
 
     // Items
     if (room->item) {
         if (room->item->type == HEAL) {
             player->hp += room->item->value;
-            printf("🎁 Je vindt een healing item! 💊 HP +%d (\033[1m%d\033[0m)\n", room->item->value, player->hp);
+            printf("Je vindt een healing item! +%d HP (\033[1m%d\033[0m)\n", room->item->value, player->hp);
         } else if (room->item->type == DAMAGE) {
             player->damage += room->item->value;
-            printf("🎁 Je vindt een kracht-item! 📈 Damage +%d (\033[1m%d\033[0m)\n", room->item->value, player->damage);
+            printf("Je vindt een kracht-item! +%d damage (\033[1m%d\033[0m)\n", room->item->value, player->damage);
         }
         free(room->item);
         room->item = NULL;
@@ -121,8 +121,9 @@ void enter_room(Room *room, Player *player) {
         fight(player, room);
     }
 
-    printf("\033[33m===========================\n\033[0m");
+    printf("\033[33m===========================\033[0m\n");
 }
+
 
 
 void print_doors(Room *room) {
