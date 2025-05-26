@@ -12,15 +12,19 @@ void save_game(const char *filename, Player *player, Room **rooms, int room_coun
         return;
     }
 
+    // Spelergegevens
     fprintf(file, "%d %d %d\n", player->location, player->hp, player->damage);
     fprintf(file, "%d\n", room_count);
 
+    // Kamers
     for (int i = 0; i < room_count; i++) {
         Room *r = rooms[i];
         fprintf(file, "%d ", r->id);
+
         for (int j = 0; j < 4; j++) {
             fprintf(file, "%d ", r->connections[j]);
         }
+
         fprintf(file, "%d %d ", r->visited, r->has_treasure);
 
         if (r->item) {
@@ -58,24 +62,26 @@ void load_game(const char *filename, Player *player, Room ***rooms_ptr, int *roo
         r->item = NULL;
 
         fscanf(file, "%d", &r->id);
+
         for (int j = 0; j < 4; j++) {
             fscanf(file, "%d", &r->connections[j]);
         }
+
         fscanf(file, "%d %d", &r->visited, &r->has_treasure);
 
-        char label[20];
-        fscanf(file, "%s", label);
+        char token[20];
+        fscanf(file, "%s", token);
 
-        if (strcmp(label, "ITEM") == 0) {
+        if (strcmp(token, "ITEM") == 0) {
             r->item = malloc(sizeof(Item));
             int type, value;
             fscanf(file, "%d %d", &type, &value);
             r->item->type = type;
             r->item->value = value;
-            fscanf(file, "%s", label);  // Lees volgende label: MONSTER of NOMONSTER
+            fscanf(file, "%s", token); // Lees volgende token: MONSTER of NOMONSTER
         }
 
-        if (strcmp(label, "MONSTER") == 0) {
+        if (strcmp(token, "MONSTER") == 0) {
             r->monster = malloc(sizeof(Monster));
             fscanf(file, "%s %d %d", r->monster->name, &r->monster->hp, &r->monster->damage);
         }
