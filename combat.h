@@ -11,5 +11,6 @@ typedef struct Monster {
 } Monster;
 
 void combat(Player *player, Monster *monster);
+void fight(Player *player, Room *room); // <-- toegevoegd
 
 #endif
