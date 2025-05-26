@@ -3,9 +3,8 @@
 
 #include "player.h"
 #include "utils.h"
-#include "combat.h"  // voor struct Monster
+#include "combat.h"
 #include "item.h"
-
 
 typedef enum { EMPTY, MONSTER, ITEM, TREASURE } RoomType;
 

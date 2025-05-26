@@ -11,7 +11,7 @@ void fight(Player* player, Room* room) {
     srand(time(NULL));
 
     while (player->hp > 0 && monster->hp > 0) {
-        int attackOrder = rand() % 17; // 0–16
+        int attackOrder = rand() % 17;
         printf("Aanval volgorde (binair): ");
         for (int i = 4; i >= 0; i--) {
             printf("%d", (attackOrder >> i) & 1);

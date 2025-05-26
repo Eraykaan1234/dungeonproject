@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "dungeon.h"
 #include "player.h"
 #include "item.h"
@@ -11,24 +12,24 @@ void save_game(const char *filename, Player *player, Room **rooms, int room_coun
         return;
     }
 
-    fprintf(file, "%s %d %d %d\n", player->name, player->hp, player->damage, player->current_room);
+    fprintf(file, "%d %d %d\n", player->location, player->hp, player->damage);
+    fprintf(file, "%d\n", room_count);
 
     for (int i = 0; i < room_count; i++) {
         Room *r = rooms[i];
-        fprintf(file, "ROOM %d ", r->id);
+        fprintf(file, "%d ", r->id);
         for (int j = 0; j < 4; j++) {
             fprintf(file, "%d ", r->connections[j]);
         }
-        fprintf(file, "%d ", r->visited);
-        fprintf(file, "%d ", r->has_treasure);
+        fprintf(file, "%d %d ", r->visited, r->has_treasure);
 
-        if (r->item != NULL) {
+        if (r->item) {
             fprintf(file, "ITEM %d %d ", r->item->type, r->item->value);
         } else {
             fprintf(file, "NOITEM ");
         }
 
-        if (r->monster != NULL) {
+        if (r->monster) {
             fprintf(file, "MONSTER %s %d %d\n", r->monster->name, r->monster->hp, r->monster->damage);
         } else {
             fprintf(file, "NOMONSTER\n");
@@ -45,51 +46,41 @@ void load_game(const char *filename, Player *player, Room ***rooms_ptr, int *roo
         return;
     }
 
-    fscanf(file, "%s %d %d %d", player->name, &player->hp, &player->damage, &player->current_room);
+    fscanf(file, "%d %d %d", &player->location, &player->hp, &player->damage);
+    fscanf(file, "%d", room_count_ptr);
 
-    Room **rooms = malloc(sizeof(Room*) * 100);
-    int count = 0;
+    int count = *room_count_ptr;
+    Room **rooms = malloc(sizeof(Room*) * count);
 
-    while (!feof(file)) {
-        char label[20];
-        fscanf(file, "%s", label);
-        if (strcmp(label, "ROOM") != 0) break;
-
+    for (int i = 0; i < count; i++) {
         Room *r = malloc(sizeof(Room));
+        r->monster = NULL;
+        r->item = NULL;
         fscanf(file, "%d", &r->id);
-        for (int i = 0; i < 4; i++) {
-            fscanf(file, "%d", &r->connections[i]);
+        for (int j = 0; j < 4; j++) {
+            fscanf(file, "%d", &r->connections[j]);
         }
-        fscanf(file, "%d", &r->visited);
-        fscanf(file, "%d", &r->has_treasure);
+        fscanf(file, "%d %d", &r->visited, &r->has_treasure);
 
-        char item_label[20];
-        fscanf(file, "%s", item_label);
-        if (strcmp(item_label, "ITEM") == 0) {
+        char buffer[20];
+        fscanf(file, "%s", buffer);
+        if (strcmp(buffer, "ITEM") == 0) {
             r->item = malloc(sizeof(Item));
             int type, value;
             fscanf(file, "%d %d", &type, &value);
             r->item->type = type;
             r->item->value = value;
-        } else {
-            r->item = NULL;
+            fscanf(file, "%s", buffer); // Lees MONSTER/NOMONSTER
         }
 
-        char monster_label[20];
-        fscanf(file, "%s", monster_label);
-        if (strcmp(monster_label, "MONSTER") == 0) {
+        if (strcmp(buffer, "MONSTER") == 0) {
             r->monster = malloc(sizeof(Monster));
-            r->monster->name = malloc(50);
             fscanf(file, "%s %d %d", r->monster->name, &r->monster->hp, &r->monster->damage);
-        } else {
-            r->monster = NULL;
         }
 
-        rooms[count++] = r;
+        rooms[i] = r;
     }
 
     *rooms_ptr = rooms;
-    *room_count_ptr = count;
-
     fclose(file);
 }

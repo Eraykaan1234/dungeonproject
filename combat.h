@@ -2,7 +2,6 @@
 #define COMBAT_H
 
 #include "player.h"
-#include "dungeon.h"
 
 typedef struct Monster {
     char name[20];
@@ -10,7 +9,8 @@ typedef struct Monster {
     int damage;
 } Monster;
 
-void combat(Player *player, Monster *monster);
-void fight(Player *player, Room *room); // <-- toegevoegd
+struct Room;  // forward declaration
+
+void fight(Player *player, struct Room *room);
 
 #endif
