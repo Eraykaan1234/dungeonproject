@@ -9,7 +9,8 @@ typedef struct Monster {
     int damage;
 } Monster;
 
-struct Room;  // forward declaration
+
+struct Room;
 
 void fight(Player *player, struct Room *room);
 

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "combat.h"
+#include "dungeon.h"  // <-- zorgt dat 'Room' bekend is
 
 void fight(Player* player, Room* room) {
     Monster* monster = room->monster;
