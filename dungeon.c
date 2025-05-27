@@ -98,45 +98,64 @@ void generate_dungeon(Room ***rooms_ptr, int count) {
     *rooms_ptr = rooms;
 }
 
-void enter_room(Room *room, Player *player) {
-    printf("\033[33m===========================\n");
-    printf("\033[1mJe betreedt kamer %d\033[0m\n", room->id);
-    printf("---------------------------\033[0m\n");
+#define INDENT "       "
 
-    // Items
+void enter_room(Room *room, Player *player) {
+    char kamerregel[50];
+sprintf(kamerregel, "Je betreedt kamer %d", room->id);
+int textlen = strlen(kamerregel);
+int boxwidth = textlen + 8;  // voeg ruimte toe
+
+// Top rand
+printf(INDENT "\033[1;36m╔");
+for (int i = 0; i < boxwidth; i++) printf("═");
+printf("╗\n");
+
+// Midden met tekst gecentreerd
+int padding_left = (boxwidth - textlen) / 2;
+int padding_right = boxwidth - textlen - padding_left;
+
+printf(INDENT "║%*s%s%*s║\n", padding_left, "", kamerregel, padding_right, "");
+
+// Onder rand
+printf(INDENT "╚");
+for (int i = 0; i < boxwidth; i++) printf("═");
+printf("╝\033[0m\n");
+
     if (room->item) {
         if (room->item->type == HEAL) {
             player->hp += room->item->value;
-            printf("Je vindt een healing item! +%d HP (\033[1m%d\033[0m)\n", room->item->value, player->hp);
-        } else if (room->item->type == DAMAGE) {
+            printf(INDENT "\033[1;32m💚 Je vindt een healing item! +%d HP (\033[1m%d\033[0m)\033[0m\n",
+                   room->item->value, player->hp);
+        } else {
             player->damage += room->item->value;
-            printf("Je vindt een kracht-item! +%d damage (\033[1m%d\033[0m)\n", room->item->value, player->damage);
+            printf(INDENT "\033[1;31m💥 Je vindt een kracht-item! +%d damage (\033[1m%d\033[0m)\033[0m\n",
+                   room->item->value, player->damage);
         }
         free(room->item);
         room->item = NULL;
     }
 
-    // Monster
     if (room->monster) {
         fight(player, room);
     }
 
-    printf("\033[33m===========================\033[0m\n");
+    printf(INDENT "\033[33m===========================\033[0m\n");
 }
 
 
-
 void print_doors(Room *room) {
-    printf("\033[36m---------------------------\n");
-    printf("De kamer heeft deuren naar kamers:\n");
+    #define INDENT "       "
+    printf(INDENT "\033[36m╭─────────────╮\n");
+    printf(INDENT "│ Kamers bereikbaar:\n");
 
     for (int i = 0; i < 4; i++) {
         if (room->connections[i] != -1) {
-            printf("  - Kamer %d\n", room->connections[i]);
+            printf(INDENT "│ → Kamer %d\n", room->connections[i]);
         }
     }
 
-    printf("---------------------------\033[0m\n");
+    printf(INDENT "╰─────────────╯\033[0m\n");
 }
 
 void free_dungeon(Room **rooms, int count) {
