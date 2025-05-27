@@ -1,100 +1,101 @@
-# dungeonproject
-# Dungeon Game - README
+**Dungeon Game: Volledig Gedocumenteerd Project**
+Welkom bij de Dungeon Game!
 
-Welkom bij het Dungeon Game project! Dit is een text-based avonturenspel geschreven in C, waarin je door kamers navigeert, monsters bevecht en probeert de schat te vinden.
+Dit project is een text-based dungeon crawler in C, compleet met:
 
-## 🔧 Vereisten
+* gevechten,
+* willekeurig gegenereerde kamers,
+* items,
+* save/load functionaliteit,
+* en kleurrijke terminal-output met animaties.
 
-Om dit project te compileren en uit te voeren, heb je het volgende nodig:
+---
+## 🔧 Compilatie-instructies (Ubuntu / VSCode)
 
-* **GCC compiler** (voor Linux zoals Ubuntu)
-* Of **Visual Studio Code** met een C/C++ compiler en terminal
-
-## 🧪 Bestandenstructuur
-
+1. Zorg dat je `gcc` en `make` hebt geïnstalleerd:
 ```bash
-📁 dungeon_game/
-├── main.c           # Het hoofdprogramma (startpunt)
-├── dungeon.c        # Dungeongeneratie, kamers en deuren
-├── dungeon.h        # Header voor dungeon.c
-├── combat.c         # Gevechtslogica (monsters, animaties)
-├── combat.h         # Header voor combat.c
-├── player.c         # Spelerstruct en initialisatie
-├── player.h         # Header voor player.c
-├── save.c           # Opslaan en laden van speldata
-├── save.h           # Header voor save.c
-├── utils.c          # Algemene hulpfuncties
-├── utils.h          # Header voor utils.c
-└── item.h           # Structs voor items
+sudo apt update && sudo apt install build-essential
 ```
 
-## 🚀 Compileren en Spelen
-
-### Voor Ubuntu:
-
-Open je terminal in de map van het project en voer in:
-
+2. Compileer met:
 ```bash
 gcc main.c dungeon.c combat.c player.c save.c utils.c -o dungeon_game.exe
-./dungeon_game.exe 10
 ```
 
-### Voor Visual Studio Code:
-
-1. Installeer de extensie: **C/C++** van Microsoft.
-2. Open een terminal in VSCode.
-3. Gebruik dezelfde compileerregel:
+3. Start het spel met een nieuw aantal kamers (bijv. 10):
 
 ```bash
-gcc main.c dungeon.c combat.c player.c save.c utils.c -o dungeon_game.exe
 ./dungeon_game.exe 10
 ```
-
-## 💡 Spelregels
-
-* Navigeer door kamers met getallen (deurnummers).
-* Vind items om te healen of je schade te verhogen.
-* Vecht tegen goblins of orcs met een binair aanvallogica.
-* Vind de kamer met de schat om te winnen.
-
-## 💬 Spel starten
+Of laad een opgeslagen spel:
 
 ```bash
-./dungeon_game.exe 10   # start een spel met 10 kamers
-./dungeon_game.exe load # laadt je opgeslagen spel
+./dungeon_game.exe load
 ```
+--
 
-## 📌 Opmerkingen
+## 📁 Bestandsstructuur en Functies
 
-* Het spel slaat automatisch je voortgang op na elke kamer.
-* De gevechten zijn willekeurig bepaald met een "aanval volgorde".
-* Als je HP nul is, verlies je. Als het monster verslagen is, ga je verder.
+### `main.c`
 
-## 📚 Code uitleg
+* **Main game loop**
+* Handelt input van speler af
+* Roept `enter_room`, `print_doors`, `fight`, en `save/load_game`
+* Toont `Victory` of `Game Over` met animatie
 
-Elke `.c` en `.h` bestand bevat commentaarregels die uitleg geven over wat de functie of structuur doet. Hier zijn voorbeelden:
+### `combat.c`
 
-### Voorbeeld - `combat.c`
+* `fight(Player*, Room*)`: regelt het volledige gevecht
+* `print_hp_bar`: toont kleurrijke healthbar (groen/geel/rood)
+* Maakt gebruik van animatie, ascii-boxen, vertraging (`usleep`) en kleur
 
-```c
-// Tekent een gekleurde health bar voor speler of monster
-void print_hp_bar(const char* label, int hp, int max_hp) { ... }
+### `dungeon.c`
 
-// Regelt het hele gevecht tussen speler en monster
-void fight(Player* player, Room* room) { ... }
-```
+* `generate_dungeon()`: maakt random kamers + connecties
+* `create_room()`, `connect_rooms()` enz.
+* `enter_room()`: toont kamer-info, loot, triggers gevechten
+* `print_doors()`: toont mogelijke uitgangen
+* `free_dungeon()`: geheugen opruimen
 
-### Voorbeeld - `dungeon.c`
+### `player.c`
 
-```c
-// Genereert een kamer met lege inhoud
-Room *create_room(int id) { ... }
+* `init_player()`: stelt begingezondheid en schade in
+* Struct definitie voor `Player`
 
-// Verbindt twee kamers met elkaar
-void connect_rooms(Room **rooms, int from, int to) { ... }
-```
+### `save.c`
 
-## ✨ Credits
+* `save_game(...)` en `load_game(...)` lezen/schrijven speldata naar `save.txt`
+* Maakt gebruik van eenvoudige bestand-IO (`fprintf`, `fscanf`)
 
-Project gebouwd door Eray kaan Koç met hulp van ChatGPT als copiloot.
-Veel plezier met je dungeon avontuur! 🐉🏆
+### `utils.c`
+
+* Kleine hulpmethoden zoals `random_getal_tussen(min, max)`
+
+### `item.h`
+
+* Enum voor items: HEAL en DAMAGE
+* `Item` struct met type + waarde
+
+### `dungeon.h`, `player.h`, `combat.h`, `item.h`, `utils.h`, `save.h`
+
+* Header files met struct- en functie-declaraties
+
+---
+
+## 📌 Extra Features
+
+* 🎨 Kleurrijke ASCII-boxen
+* 🎉 Victory-scherm met confetti animatie
+* 💚 Healing-items en 💥 Damage boosters
+* 💀 Doodscherm met rode melding
+* ✅ Save/load via `save.txt`
+
+---
+
+## ✅ Aanbevolen instellingen (VSCode)
+
+* Installeer extensie: `C/C++` van Microsoft
+* Gebruik `gcc` als default compiler
+* Gebruik `Terminal > Run Task...` of eigen `Makefile`
+
+Gemaakt met ❤️ door mij (Eray)
